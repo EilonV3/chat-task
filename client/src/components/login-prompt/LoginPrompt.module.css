@@ -1,0 +1,36 @@
+.promptContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  .promptTitle {
+    font-family: 'Poppins', sans-serif;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+  
+  .usernameInput {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #bdc3c7;
+    width: 300px;
+    margin-bottom: 20px;
+  }
+  
+  .enterButton {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .enterButton:hover {
+    background-color: #3498db;
+  }
+  

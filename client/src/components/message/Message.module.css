@@ -1,0 +1,15 @@
+.message {
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #3498db;
+    color: white;
+    max-width: 60%;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .sender {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  

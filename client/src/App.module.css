@@ -40,3 +40,17 @@
 .read-the-docs {
   color: #888;
 } */
+.appContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f7f9fc;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  color: #2c3e50;
+}

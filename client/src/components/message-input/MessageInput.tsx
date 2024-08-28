@@ -1,35 +1,33 @@
 import React, { useState } from 'react';
+import styles from './MessageInput.module.css';
 
-interface MessageInputProps {
-  onSendMessage: (message: string) => void;
-}
+function MessageInput({ onSendMessage }) {
+  const [message, setMessage] = useState('');
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
-  const [input, setInput] = useState<string>('');
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(event.target.value);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (input.trim()) {
-      onSendMessage(input);
-      setInput(''); // Clear input field
+  const handleSend = () => {
+    if (message.trim()) {
+      onSendMessage(message);
+      setMessage('');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className={styles.inputContainer}>
       <input
         type="text"
-        value={input}
-        onChange={handleChange}
-        placeholder="Type your message"
+        className={styles.input}
+        placeholder="Type your message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') handleSend();
+        }}
       />
-      <button type="submit">Send</button>
-    </form>
+      <button className={styles.sendButton} onClick={handleSend}>
+        Send
+      </button>
+    </div>
   );
-};
+}
 
 export default MessageInput;
