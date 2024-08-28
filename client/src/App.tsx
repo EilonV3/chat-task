@@ -1,63 +1,82 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MessageInput from './components/message-input/MessageInput';
 
-import './App.css'; // Assuming you have styles in this file
+interface Message {
+  sender: string;
+  content: string;
+}
 
-const App: React.FC = () => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+function App() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3000'); // Ensure this matches your server
+    if (username) {
+      const socket = new WebSocket('ws://localhost:12345');
+      socket.onopen = () => {
+        console.log('Connected to server');
+        setWs(socket);
+        // Send username to the server
+        socket.send(JSON.stringify({ sender: username, content: '' }));
+      };
 
-    ws.onopen = () => {
-      console.log('WebSocket connection established');
-      setIsConnected(true);
-    };
+      socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        console.log('Received message:', message);
+        if (message.sender !== username) {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        }
+      };
 
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
-      setIsConnected(false);
-    };
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    ws.onmessage = (event) => {
-      const message = event.data;
-      setMessages((prevMessages) => [...prevMessages, message]);
-    };
-
-    setSocket(ws);
-
-    return () => {
-      ws.close();
-    };
-  }, []);
+      return () => {
+        socket.close();
+      };
+    }
+  }, [username]);
 
   const handleSendMessage = (message: string) => {
-    if (socket && isConnected) {
-      socket.send(message);
-    } else {
-      console.error('WebSocket is not connected');
+    if (ws && username) {
+      const messageObject = { sender: username, content: message };
+      ws.send(JSON.stringify(messageObject));
+      setMessages((prevMessages) => [...prevMessages, messageObject]);
     }
   };
 
+  if (!username) {
+    return (
+      <div>
+        <h1>Enter your username</h1>
+        <input
+          type="text"
+          placeholder="Username"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setUsername(e.currentTarget.value);
+            }
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="app">
-      <h1>Chat Application</h1>
-      <div className="messages">
+    <div>
+      <h1>Group Chat</h1>
+      <div id="chat">
         {messages.map((msg, index) => (
-          <div key={index} className="message">
-            {msg}
+          <div key={index}>
+            <strong>{msg.sender}:</strong> {msg.content}
           </div>
         ))}
       </div>
       <MessageInput onSendMessage={handleSendMessage} />
     </div>
   );
-};
+}
 
 export default App;
