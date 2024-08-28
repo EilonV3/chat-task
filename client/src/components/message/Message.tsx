@@ -4,7 +4,11 @@ import styles from './Message.module.css';
 function Message({ sender, content }) {
   return (
     <div className={styles.message}>
-      <strong className={styles.sender}>{sender}:</strong> {content}
+      {sender ? (
+        <>
+          <strong className={styles.sender}>{sender}:</strong> {content}
+        </>
+      ) : <>{content}</>}
     </div>
   );
 }

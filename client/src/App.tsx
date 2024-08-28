@@ -12,8 +12,8 @@ interface Message {
 function App() {
   const [messages, setMessages] = useState([]);
   const [ws, setWs] = useState(null);
-  const [username, setUsername] = useState(null);
-
+  const [username, setUsername] = useState<string>('');
+  const filteredMessages = messages.filter((message) => message.sender !== username)
   useEffect(() => {
     if (username) {
       const socket = new WebSocket('ws://localhost:12345');
@@ -23,8 +23,10 @@ function App() {
       };
 
       socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        if (message.sender !== username) {
+        const message: Message = JSON.parse(event.data);
+        const receivedSender = message.sender;
+        const currentUsername = username;
+        if (receivedSender !== currentUsername) {
           setMessages((prevMessages) => [...prevMessages, message]);
         }
       };
@@ -50,7 +52,7 @@ function App() {
   return (
     <div className={styles.appContainer}>
       <h1 className={styles.title}>Group Chat</h1>
-      <ChatWindow messages={messages} />
+      <ChatWindow messages={filteredMessages} />
       <MessageInput onSendMessage={handleSendMessage} />
     </div>
   );
