@@ -1,32 +1,43 @@
 import React, { useState } from 'react';
 import styles from './LoginPrompt.module.css';
 
-function LoginPrompt({ onSetUsername }) {
-  const [username, setUsername] = useState('');
+interface LoginPromptProps {
+  onSetCredentials: (username: string, port: string) => void;
+}
 
-  const handleSetUsername = () => {
-    if (username.trim()) {
-      onSetUsername(username);
+function LoginPrompt({ onSetCredentials }: LoginPromptProps) {
+  const [username, setUsername] = useState<string>('');
+  const [port, setPort] = useState<string>('12345');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username && port) {
+      onSetCredentials(username, port);
     }
   };
 
   return (
-    <div className={styles.promptContainer}>
-      <h2 className={styles.promptTitle}>Enter your username</h2>
-      <input
-        type="text"
-        className={styles.usernameInput}
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') handleSetUsername();
-        }}
-      />
-      <button className={styles.enterButton} onClick={handleSetUsername}>
-        Enter
-      </button>
-    </div>
+    <form className={styles.loginForm} onSubmit={handleSubmit}>
+      <label>
+        Username:
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Port:
+        <input
+          type="number"
+          value={port}
+          onChange={(e) => setPort(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit">Join Chat</button>
+    </form>
   );
 }
 

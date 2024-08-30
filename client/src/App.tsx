@@ -10,13 +10,16 @@ interface Message {
 }
 
 function App() {
-  const [messages, setMessages] = useState([]);
-  const [ws, setWs] = useState(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [ws, setWs] = useState<WebSocket | null>(null);
   const [username, setUsername] = useState<string>('');
-  const filteredMessages = messages.filter((message) => message.sender !== username)
+  const [port, setPort] = useState<string>('');
+  
+  const filteredMessages = messages.filter((message) => message.sender !== username);
+
   useEffect(() => {
-    if (username) {
-      const socket = new WebSocket('ws://localhost:12345');
+    if (username && port) {
+      const socket = new WebSocket(`ws://localhost:${port}`);
       socket.onopen = () => {
         setWs(socket);
         socket.send(JSON.stringify({ sender: username, content: '' }));
@@ -24,9 +27,7 @@ function App() {
 
       socket.onmessage = (event) => {
         const message: Message = JSON.parse(event.data);
-        const receivedSender = message.sender;
-        const currentUsername = username;
-        if (receivedSender !== currentUsername) {
+        if (message.sender !== username) {
           setMessages((prevMessages) => [...prevMessages, message]);
         }
       };
@@ -35,9 +36,9 @@ function App() {
         socket.close();
       };
     }
-  }, [username]);
+  }, [username, port]);
 
-  const handleSendMessage = (message) => {
+  const handleSendMessage = (message: string) => {
     if (ws && username) {
       const messageObject = { sender: username, content: message };
       ws.send(JSON.stringify(messageObject));
@@ -45,8 +46,13 @@ function App() {
     }
   };
 
-  if (!username) {
-    return <LoginPrompt onSetUsername={setUsername} />;
+  const handleSetCredentials = (username: string, port: string) => {
+    setUsername(username);
+    setPort(port);
+  };
+
+  if (!username || !port) {
+    return <div className={styles.appContainer}><LoginPrompt onSetCredentials={handleSetCredentials} /></div>;
   }
 
   return (
